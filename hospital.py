@@ -36,6 +36,7 @@ class Hospital:
         self.inventory = []
         self.invoicing = 0.0
         self.emergency_cases = []
+        self.__initialized = True
     
     def find_person(self, cpf, group):
         for person in group:
