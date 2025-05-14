@@ -1,17 +1,6 @@
 import bisect
 from patients import Patient
 
-class PatientFactory:
-    @staticmethod
-    def create_patient(name, cpf, age, gender, contact, patient_type = "standard"):
-        if patient_type == "standard":
-            return Patient(name, cpf, age, gender, contact)
-        # Future expansion
-        # elif patient_type == "emergency":
-        #     return EmergencyPatient(name, age)
-        else:
-            raise ValueError(f"Unknown patient type: {patient_type}")
-
 class StaffFactory:
     @staticmethod
     def create_staff(cargo, name, cpf, age, gender, contact, salary, shift):
@@ -67,7 +56,7 @@ class Hospital:
         gender = input("Gênero do paciente: ")
         contact = input("Contato do paciente: ")
 
-        new_patient = PatientFactory.create_patient(name, cpf, age, gender, contact)
+        new_patient = Patient(name, cpf, age, gender, contact)
         self.patients.append(new_patient)
 
         print(f"\nPaciente {name} registrado com sucesso.")
