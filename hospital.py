@@ -1,5 +1,31 @@
 import bisect
-from models import Employee
+from models import Patient
+
+class PatientFactory:
+    @staticmethod
+    def create_patient(name, cpf, age, gender, contact, patient_type = "standard"):
+        if patient_type == "standard":
+            return Patient(name, cpf, age, gender, contact)
+        # Future expansion
+        # elif patient_type == "emergency":
+        #     return EmergencyPatient(name, age)
+        else:
+            raise ValueError(f"Unknown patient type: {patient_type}")
+
+class StaffFactory:
+    @staticmethod
+    def create_staff(cargo, name, cpf, age, gender, contact, salary, shift):
+        from staff import Doctor, Nurse, Other
+
+        if cargo == "Médico":
+            especializacao = input("Espcialização do médico: ")
+            return Doctor(name, cpf, age, gender, contact, especializacao, salary, shift)
+        elif cargo == "Enfermeiro":
+            especialidade = input("Especialidade do enfermeiro: ")
+            return Nurse(name, cpf, age, gender, contact, salary, shift, especialidade)
+        else:
+            cargo = input("Cargo do funcionário: ")
+            return Other(name, cpf, age, gender, contact, cargo, salary, shift)
 
 class Hospital:
     _instance = None
@@ -29,7 +55,6 @@ class Hospital:
         return None
     
     def register_patient(self):
-        from patients import Patient
         name = input("\nNome do paciente: ")
         cpf = input("CPF do paciente: ")
 
@@ -42,7 +67,7 @@ class Hospital:
         gender = input("Gênero do paciente: ")
         contact = input("Contato do paciente: ")
 
-        new_patient = Patient(name, cpf, age, gender, contact)
+        new_patient = PatientFactory.create_patient(name, cpf, age, gender, contact)
         self.patients.append(new_patient)
 
         print(f"\nPaciente {name} registrado com sucesso.")
@@ -81,32 +106,17 @@ class Hospital:
         salary = input("Salário do funcionário: ")
         shift = input("Turno do funcionário: ")
         
-        if cargo.lower() == "médico" or cargo.lower() == "medico":
-            especializacao = input("Especialização: ")
-            funcionario = Employee.factory(cargo, name, cpf, age, gender, contact, especializacao, salary, shift)
-        elif cargo.lower() == "enfermeiro":
-            setor = input("Setor: ")
-            funcionario = Employee.factory(cargo, name, cpf, age, gender, contact, setor, salary, shift)
-        else:
-            funcionario = Employee.factory(cargo, name, cpf, age, gender, contact, cargo, salary, shift)
+        funcionario = StaffFactory.create_staff(cargo, name, cpf, age, gender, contact, salary, shift)
 
         self.employees.append(funcionario)
+
+        if cargo == "Médico":
+            self.doctors.append(funcionario)
+        elif cargo == "Enfermeiro":
+            self.nurses.append(funcionario)
+        
         print(f"\nFuncionário {funcionario.nome} registrado com sucesso.")
         
-        if cargo == "Médico":
-            from staff import Doctor
-            specialty = input("Especialização do médico: ")
-            new_employee = Doctor(name, cpf, age, gender, contact, specialty, salary, shift)
-            self.doctors.append(new_employee)
-        elif cargo == "Enfermeiro":
-            from staff import Nurse
-            specialty = input("Especialidade do enfermeiro: ")
-            new_employee = Nurse(name, cpf, age, gender, contact, salary, shift, specialty)
-            self.nurses.append(new_employee)
-        else:
-            from models import Employee
-            new_employee = Employee(name, cpf, age, gender, contact, cargo, salary, shift)
-            self.employees.append(new_employee)
     
     def add_emergency_case(self, patient):
         from menus import Menu
