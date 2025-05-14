@@ -1,5 +1,5 @@
 import bisect
-from models import Patient
+from patients import Patient
 
 class PatientFactory:
     @staticmethod
