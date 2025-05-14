@@ -1,30 +1,5 @@
 from abc import ABC, abstractmethod
 
-class InfoPrinter(ABC):
-    @abstractmethod
-    def print_info(self):
-        pass
-
-class Observer(ABC):
-    @abstractmethod
-    def update(self, subject, event):
-        pass
-
-class Subject(ABC):
-    def __init__(self):
-        self._observers = []
-
-    def attach(self, observer):
-        self._observers.append(observer)
-
-    def notify(self, event):
-        for observer in self._observers:
-            observer.update(self, event)
-
-class DoctorNotifier(Observer):
-    def update(self, subject, event):
-        print(f"[Notificação] Paciente {subject.nome}: {event}")
-
 class Person(ABC):
     def __init__(self, nome: str, cpf: str, idade: int, genero: str, contato: str):
         self._nome = nome
@@ -110,24 +85,6 @@ class Person(ABC):
     @abstractmethod
     def print_info(self):
         pass
-
-class BasicEmployeeInfoPrinter(InfoPrinter):
-    def __init__(self, employee):
-        self.employee = employee
-
-    def print_info(self):
-        print("=== INFORMAÇÕES DO FUNCIONÁRIO ===")
-        self.employee.print_info()
-
-
-class ShiftDecorator(InfoPrinter):
-    def __init__(self, wrapped):
-        self.wrapped = wrapped
-
-    def print_info(self):
-        self.wrapped.print_info()
-        print("\n--- TURNOS ---")
-        self.wrapped.employee.print_shift()
 
 class Employee (Person, ABC):
     available_shifts = {}
