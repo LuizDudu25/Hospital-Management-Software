@@ -1,14 +1,5 @@
-from models import Employee, InfoPrinter
+from models import Employee
 from menus import Menu
-
-class ExamScheduleDecorator(InfoPrinter):
-    def __init__(self, wrapped):
-        self.wrapped = wrapped
-
-    def print_info(self):
-        self.wrapped.print_info()
-        print("\n--- CONSULTAS AGENDADAS ---")
-        self.wrapped.employee.print_schedule()
 
 class Doctor(Employee):
     available_shifts = ["Diurno", "Noturno", "Plantão 24h"]
@@ -183,10 +174,7 @@ def staff_area(hospital):
         employee = hospital.find_person(cpf, group)
 
         if employee:
-            from models import BasicEmployeeInfoPrinter, ShiftDecorator, ExamScheduleDecorator
-
-            printer = BasicEmployeeInfoPrinter(employee)
-            printer.print_info()
+            employee.print_info()
 
             choice = input("\nDeseja alterar as informações do funcionário? (S/N) ")
             if choice == 'S':
