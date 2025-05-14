@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
-from models import Person, InfoPrinter, Subject, DoctorNotifier
+from models import Person
 from menus import Menu
+
+class InfoPrinter(ABC):
+    @abstractmethod
+    def print_info(self):
+        pass
 
 class BasicPatientInfoPrinter(InfoPrinter):
     def __init__(self, patient):
@@ -46,6 +51,29 @@ class LabTestsDecorator(InfoPrinter):
         print("\n--- TESTES LABORATORIAIS ---")
         self.wrapped.patient.print_lab_tests()
 
+class Observer(ABC):
+    @abstractmethod
+    def update(self, subject, data):
+        pass
+
+class Subject:
+    def __init__(self):
+        self._observers = []
+
+    def attach(self, observer):
+        self._observers.append(observer)
+
+    def detach(self, observer):
+        self._observers.remove(observer)
+
+    def notify(self, data=None):
+        for observer in self._observers:
+            observer.update(self, data)
+
+class DoctorNotifier(Observer):
+    def update(self, subject, data):
+        print(f"[Médico] Paciente {subject.nome}: {data}")
+
 class Medical_record:
     def __init__(self, medico, data, hora, diagnostico):
         self.medico = medico
@@ -66,27 +94,16 @@ class Prescription:
     def __str__(self):
         return f'{self.medico}\n{self.data} | {self.hora}\n{self.prescricao}\n'
 
-class Lab_test:
-    def __init__(self, tipo, data, hora):
-        self.tipo = tipo
-        self.data = data
-        self.hora = hora
-        self.resultado = None
-    
-    def __str__(self):
-        return f'{self.tipo} | {self.data} | {self.hora}'
-
 class Patient(Person, Subject):
     def __init__(self, nome, cpf, idade, genero, contato):
-        Person().__init__(self, nome, cpf, idade, genero, contato)
-        Subject().__init__(self)
+        super().__init__(nome, cpf, idade, genero, contato)
+        Subject.__init__(self)
         self.__appointments = []
         self.__medical_record = []
         self.__bills = []
         self.__prescricoes = []
         self.__testes = []
         self.ward = None 
-        self.attach(DoctorNotifier())
 
     @property
     def appointments(self):
@@ -254,6 +271,8 @@ def profile(patient):
                 data = input("Digite a data para realizar o teste: ")
                 hora = input("Digite a hora para realizar o teste: ")
 
+                from appointments import Lab_test
+                
                 teste = Lab_test(tipo, data, hora)
                 patient.add_test(teste)
         elif choice == '0':
